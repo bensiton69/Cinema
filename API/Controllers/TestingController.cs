@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Interfaces;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -13,22 +17,39 @@ namespace API.Controllers
     public class TestingController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public TestingController(DataContext context)
+        public TestingController(DataContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
 
-        [HttpPost("TestCostumeUser")]
-        public async Task<ActionResult> TestCostumeUser()
+        [HttpPost("TestInterfaces")]
+        public async Task<ActionResult> TestInterfaces()
         {
-            return Accepted();
-            //var rolesList = new List<AppUserRole>();
-            //rolesList.Add((AppUserRole) "Member");
-            //var photographer = new PhotographerUser() { UserName = "testiPhotogrpher", Id = new Guid(), UserRoles = rolesList };
-            //await _context.Users.AddAsync(photographer);
-            //return Ok(await _context.Users.FindAsync(photographer.Id));
+            var users = await _userManager.Users
+                .Include(r => r.UserRoles)
+                .ThenInclude(r => r.Role)
+                .OrderBy(u => u.UserName)
+                .ToListAsync();
+
+            List<string> admins = new List<string>();
+            List<string> costumers = new List<string>();
+
+            foreach (AppUser appUser in users)
+            {
+                if(appUser is IAdmin)
+                    admins.Add(appUser.UserName);
+                if (appUser is ICostumer)
+                    costumers.Add(appUser.UserName);
+            }
+            
+
+
+            return Ok(new { admins, costumers });
+
         }
 
         [HttpGet("TestForMember")]
@@ -39,7 +60,7 @@ namespace API.Controllers
         }
 
         [HttpGet("TestForAdmin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "AdminUser")]
         public async Task<ActionResult> TestForAdmin()
         {
             return Ok("Success");

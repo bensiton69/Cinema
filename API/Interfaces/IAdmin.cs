@@ -1,6 +1,6 @@
 ﻿namespace API.Interfaces
 {
-    public interface IUserAdmin
+    public interface IAdmin
     {
 
     }

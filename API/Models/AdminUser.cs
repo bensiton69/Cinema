@@ -2,7 +2,7 @@
 
 namespace API.Models
 {
-    public class AdminUser : AppUser, IUserAdmin
+    public class AdminUser : AppUser, IAdmin
     {
     }
 }

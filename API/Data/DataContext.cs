@@ -1,4 +1,5 @@
 ﻿using System;
+using API.Interfaces;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,6 @@ namespace API.Data
         {
             base.OnModelCreating(builder);
 
-
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.User)
@@ -33,9 +33,9 @@ namespace API.Data
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
 
-
-
             builder.Entity<AdminUser>();
+            builder.Entity<CostumerUser>()
+                .Ignore(u => u.Reservations);
         }
     }
 
