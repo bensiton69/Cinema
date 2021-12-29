@@ -7,11 +7,13 @@ namespace API.Data
     {
         private readonly DataContext _context;
         public IMovieRepository MovieRepository { get; }
+        public IUserRepository UserRepository { get; }
 
-        public UnitOfWork(IMovieRepository movieRepository, DataContext context)
+        public UnitOfWork(IMovieRepository movieRepository, DataContext context, IUserRepository userRepository)
         {
             _context = context;
             MovieRepository = movieRepository;
+            UserRepository = userRepository;
         }
 
         public async Task CompleteAsync()

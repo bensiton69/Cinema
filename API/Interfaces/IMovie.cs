@@ -14,6 +14,6 @@ namespace API.Interfaces
         public eGenre Genre { get; set; }
         public int ProductionYear { get; set; }
         public ICollection<ShowTime> ShowTimes { get; set; }
-        //public List<EMovieType> ShowingIn { get; set; }
+        //public List<eMovieType> ShowingIn { get; set; }
     }
 }

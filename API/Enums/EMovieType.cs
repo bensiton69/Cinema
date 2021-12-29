@@ -1,6 +1,6 @@
 ﻿namespace API.Enums
 {
-    public enum EMovieType
+    public enum eMovieType
     {
         IMAX,
         VIP,

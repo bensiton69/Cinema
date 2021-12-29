@@ -14,12 +14,12 @@ namespace API.Models
         public eGenre Genre { get; set; }
         public int ProductionYear { get; set; }
         public ICollection<ShowTime> ShowTimes { get; set; }
-        //public List<EMovieType> ShowingIn { get; set; }
+        //public List<eMovieType> ShowingIn { get; set; }
 
         public Movie()
         {
             ShowTimes = new List<ShowTime>();
-            //ShowingIn = new List<EMovieType>();
+            //ShowingIn = new List<eMovieType>();
         }
     }
 }

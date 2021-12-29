@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
+using API.Interfaces;
 using API.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -15,28 +16,25 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UsersController(DataContext context, IMapper mapper)
+        public UsersController(IUnitOfWork unitOfWork)
         {
-            _context = context;
-            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<KeyValuePairDto>>> GetUsers()
+        public Task<IEnumerable<KeyValuePairDto>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
-            return _mapper.Map<IEnumerable<AppUser>, List<KeyValuePairDto>>(users);
+            return _unitOfWork.UserRepository.GetUsers();
         }
 
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<KeyValuePairDto>> GetUser(Guid id)
+        public Task<KeyValuePairDto> GetUser(Guid id)
         {
-            return _mapper.Map<AppUser, KeyValuePairDto>(await _context.Users.FindAsync(id));
+            return _unitOfWork.UserRepository.GetUser(id);
         }
 
         [HttpDelete("{id}")]
@@ -44,11 +42,12 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
 
-            var user = await _context.Users.FindAsync(id);
+            var user = await _unitOfWork.UserRepository.GetUser(id);
             if (user == null)
                 return NotFound();
-            _context.Remove(user);
-            await _context.SaveChangesAsync();
+
+            _unitOfWork.UserRepository.Remove(id);
+            await _unitOfWork.CompleteAsync();
             return Ok(id);
         }
     }

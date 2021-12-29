@@ -21,6 +21,7 @@ namespace API.Extensions
             services.AddSingleton(mapper);
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddDbContextPool<DataContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("CinemaDBConnection")));

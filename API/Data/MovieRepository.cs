@@ -32,7 +32,6 @@ namespace API.Data
 
         public Movie Add(MoviePostDto moviePostDto)
         {
-            //TODO: check without newGuid
             Movie movie = _mapper.Map<MoviePostDto, Movie>(moviePostDto);
             _context.Movies.Add(movie);
             return movie;
