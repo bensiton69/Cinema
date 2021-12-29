@@ -35,15 +35,7 @@ namespace API
         {
 
             services.AddIdentityServices(Configuration);
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-            IMapper mapper = mapperConfig.CreateMapper();
-            services.AddSingleton(mapper);
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddDbContextPool<DataContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("CinemaDBConnection")));
+            services.AddApplicationServices(Configuration);
             services.AddControllers(); services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });

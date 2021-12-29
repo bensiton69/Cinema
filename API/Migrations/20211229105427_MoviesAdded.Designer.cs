@@ -4,14 +4,16 @@ using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211229105427_MoviesAdded")]
+    partial class MoviesAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,36 +162,6 @@ namespace API.Migrations
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("API.Models.Reservation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CostumerUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("OrderTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<Guid?>("ShowTimeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CostumerUserId");
-
-                    b.HasIndex("ShowTimeId");
-
-                    b.ToTable("Reservations");
-                });
-
             modelBuilder.Entity("API.Models.Seat", b =>
                 {
                     b.Property<Guid>("Id")
@@ -205,9 +177,6 @@ namespace API.Migrations
                     b.Property<bool>("IsHandicapped")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ReservationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("RowNumber")
                         .HasColumnType("int");
 
@@ -221,8 +190,6 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReservationId");
 
                     b.HasIndex("VenueNumber");
 
@@ -394,25 +361,8 @@ namespace API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("API.Models.Reservation", b =>
-                {
-                    b.HasOne("API.Models.CostumerUser", null)
-                        .WithMany("Reservations")
-                        .HasForeignKey("CostumerUserId");
-
-                    b.HasOne("API.Models.ShowTime", "ShowTime")
-                        .WithMany()
-                        .HasForeignKey("ShowTimeId");
-
-                    b.Navigation("ShowTime");
-                });
-
             modelBuilder.Entity("API.Models.Seat", b =>
                 {
-                    b.HasOne("API.Models.Reservation", null)
-                        .WithMany("Seats")
-                        .HasForeignKey("ReservationId");
-
                     b.HasOne("API.Models.Venue", null)
                         .WithMany("AvailableSeats")
                         .HasForeignKey("VenueNumber");
@@ -494,11 +444,6 @@ namespace API.Migrations
                     b.Navigation("ShowTimes");
                 });
 
-            modelBuilder.Entity("API.Models.Reservation", b =>
-                {
-                    b.Navigation("Seats");
-                });
-
             modelBuilder.Entity("API.Models.Venue", b =>
                 {
                     b.Navigation("AvailableSeats");
@@ -506,11 +451,6 @@ namespace API.Migrations
                     b.Navigation("HandicappedSeats");
 
                     b.Navigation("UnavailableSeats");
-                });
-
-            modelBuilder.Entity("API.Models.CostumerUser", b =>
-                {
-                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

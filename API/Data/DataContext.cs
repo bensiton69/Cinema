@@ -11,6 +11,9 @@ namespace API.Data
         , IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>
         , IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
+        public DbSet<Movie> Movies { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
@@ -33,9 +36,31 @@ namespace API.Data
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
 
+            //builder.Entity<Movie>()
+            //    .HasMany(m => m.ShowingIn);
+
+            //builder.Entity<Venue>()
+            //    .HasMany(v => v.AvailableSeats)
+            //    .WithOne();
+            //builder.Entity<Venue>()
+            //    .HasMany(v => v.UnavailableSeats)
+            //    .WithOne();
+            //builder.Entity<Venue>()
+            //    .HasMany(v => v.HandicappedSeats)
+            //    .WithOne();
+
+            //builder.Entity<Venue>()
+            //    .Navigation(v => v.AvailableSeats)
+            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
+            //builder.Entity<Venue>()
+            //    .Navigation(v => v.HandicappedSeats)
+            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
+            //builder.Entity<Venue>()
+            //    .Navigation(v => v.UnavailableSeats)
+            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
+
             builder.Entity<AdminUser>();
-            builder.Entity<CostumerUser>()
-                .Ignore(u => u.Reservations);
+            builder.Entity<CostumerUser>();
         }
     }
 
