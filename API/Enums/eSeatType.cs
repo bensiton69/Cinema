@@ -3,6 +3,6 @@
     public enum eSeatType
     {
         Regular,
-        handicapped,
+        Handicapped,
     }
 }

@@ -11,6 +11,7 @@ namespace API.Mapping
         {
             CreateMap<RegisterDto, AppUser>();
             CreateMap<MoviePostDto, Movie>();
+            CreateMap<VenuePostDto, Venue>();
 
 
 

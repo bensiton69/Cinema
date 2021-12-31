@@ -12,6 +12,7 @@ namespace API.Data
         , IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<Venue> Venues { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options)
@@ -35,6 +36,11 @@ namespace API.Data
                 .WithOne(u => u.Role)
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
+
+            builder.Entity<Venue>()
+                .Ignore(v => v.AvailableSeats)
+                .Ignore(v => v.UnavailableSeats)
+                .Ignore(v => v.HandicappedSeats);
 
             //builder.Entity<Movie>()
             //    .HasMany(m => m.ShowingIn);
@@ -62,6 +68,8 @@ namespace API.Data
             builder.Entity<AdminUser>();
             builder.Entity<CostumerUser>();
         }
+
+        public DbSet<API.Models.ShowTime> ShowTime { get; set; }
     }
 
 }

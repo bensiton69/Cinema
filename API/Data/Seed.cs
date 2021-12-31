@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using API.Models;
@@ -9,6 +10,8 @@ namespace API.Data
 {
     public class Seed
     {
+        public static int NumOfVenuesToSeed { get; set; } = 5;
+
         public static async Task SeedUsers(UserManager<AppUser> userManager,
             RoleManager<AppRole> roleManager)
         {
@@ -44,6 +47,22 @@ namespace API.Data
 
             await userManager.CreateAsync(admin, "Pa$$w0rd");
             await userManager.AddToRolesAsync(admin, new[] { "AdminUser", "Moderator" });
+        }
+
+        public static async Task SeedVenues(DataContext context)
+        {
+            if (await context.Venues.AnyAsync()) return;
+
+            for (int i = 0; i < NumOfVenuesToSeed; i++)
+            {
+                Venue venue = new Venue() { NumberOfCols = 7, NumberOfRows = 7, VenueNumber = i };
+
+                context.Venues.Add(venue);
+                context.Entry<Venue>(venue).State = EntityState.Detached;
+            }
+
+            context.SaveChanges();
+
         }
 
     }

@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
 {
     public class Venue
     {
-        [Key]
+        public Guid Id { get; set; }
         public int VenueNumber { get; set; }
-        public int RowsNumber { get; set; }
-        public int ColsNumber { get; set; }
+        public int NumberOfRows { get; set; }
+        public int NumberOfCols { get; set; }
         public ICollection<Seat> AvailableSeats { get; set; }
         public ICollection<Seat> UnavailableSeats { get; set; }
         public ICollection<Seat> HandicappedSeats { get; set; }

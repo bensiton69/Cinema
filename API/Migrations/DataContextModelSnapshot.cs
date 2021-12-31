@@ -15,9 +15,9 @@ namespace API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "5.0.12")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("API.Models.AppRole", b =>
                 {
@@ -211,24 +211,9 @@ namespace API.Migrations
                     b.Property<int>("RowNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VenueNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VenueNumber1")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VenueNumber2")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ReservationId");
-
-                    b.HasIndex("VenueNumber");
-
-                    b.HasIndex("VenueNumber1");
-
-                    b.HasIndex("VenueNumber2");
 
                     b.ToTable("Seat");
                 });
@@ -245,34 +230,36 @@ namespace API.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("VenueNumber")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("VenueId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MovieId");
 
-                    b.HasIndex("VenueNumber");
+                    b.HasIndex("VenueId");
 
                     b.ToTable("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
                 {
-                    b.Property<int>("VenueNumber")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ColsNumber")
+                    b.Property<int>("NumberOfCols")
                         .HasColumnType("int");
 
-                    b.Property<int>("RowsNumber")
+                    b.Property<int>("NumberOfRows")
                         .HasColumnType("int");
 
-                    b.HasKey("VenueNumber");
+                    b.Property<int>("VenueNumber")
+                        .HasColumnType("int");
 
-                    b.ToTable("Venue");
+                    b.HasKey("Id");
+
+                    b.ToTable("Venues");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -280,7 +267,7 @@ namespace API.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -303,7 +290,7 @@ namespace API.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -412,18 +399,6 @@ namespace API.Migrations
                     b.HasOne("API.Models.Reservation", null)
                         .WithMany("Seats")
                         .HasForeignKey("ReservationId");
-
-                    b.HasOne("API.Models.Venue", null)
-                        .WithMany("AvailableSeats")
-                        .HasForeignKey("VenueNumber");
-
-                    b.HasOne("API.Models.Venue", null)
-                        .WithMany("HandicappedSeats")
-                        .HasForeignKey("VenueNumber1");
-
-                    b.HasOne("API.Models.Venue", null)
-                        .WithMany("UnavailableSeats")
-                        .HasForeignKey("VenueNumber2");
                 });
 
             modelBuilder.Entity("API.Models.ShowTime", b =>
@@ -436,7 +411,7 @@ namespace API.Migrations
 
                     b.HasOne("API.Models.Venue", "Venue")
                         .WithMany()
-                        .HasForeignKey("VenueNumber");
+                        .HasForeignKey("VenueId");
 
                     b.Navigation("Movie");
 
@@ -497,15 +472,6 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Reservation", b =>
                 {
                     b.Navigation("Seats");
-                });
-
-            modelBuilder.Entity("API.Models.Venue", b =>
-                {
-                    b.Navigation("AvailableSeats");
-
-                    b.Navigation("HandicappedSeats");
-
-                    b.Navigation("UnavailableSeats");
                 });
 
             modelBuilder.Entity("API.Models.CostumerUser", b =>
