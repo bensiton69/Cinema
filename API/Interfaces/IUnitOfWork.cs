@@ -7,6 +7,7 @@ namespace API.Interfaces
         IMovieRepository MovieRepository { get; }
         IUserRepository UserRepository { get; }
         IVenueRepository VenueRepository { get; }
+        IShowTimeRepository ShowTimeRepository { get; }
         Task CompleteAsync();
 
     }

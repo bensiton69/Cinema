@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211231062552_init")]
-    partial class init
+    [Migration("20211231074330_updates")]
+    partial class updates
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -220,7 +220,7 @@ namespace API.Migrations
                     b.ToTable("Seat");
                 });
 
-            modelBuilder.Entity("API.Models.ShowTimes", b =>
+            modelBuilder.Entity("API.Models.ShowTime", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -241,7 +241,7 @@ namespace API.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("ShowTimes");
+                    b.ToTable("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
@@ -389,11 +389,11 @@ namespace API.Migrations
                         .WithMany("Reservations")
                         .HasForeignKey("CostumerUserId");
 
-                    b.HasOne("API.Models.ShowTimes", "ShowTimes")
+                    b.HasOne("API.Models.ShowTime", "ShowTime")
                         .WithMany()
                         .HasForeignKey("ShowTimeId");
 
-                    b.Navigation("ShowTimes");
+                    b.Navigation("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -403,7 +403,7 @@ namespace API.Migrations
                         .HasForeignKey("ReservationId");
                 });
 
-            modelBuilder.Entity("API.Models.ShowTimes", b =>
+            modelBuilder.Entity("API.Models.ShowTime", b =>
                 {
                     b.HasOne("API.Models.Movie", "Movie")
                         .WithMany("ShowTimes")

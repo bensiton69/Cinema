@@ -9,5 +9,6 @@ namespace API.DTOs.GetDTOs
         public DateTime StartTime { get; set; }
         public Guid MovieId { get; set; }
         public string MovieName { get; set; }
+        public int VenueNumber { get; set; }
     }
 }

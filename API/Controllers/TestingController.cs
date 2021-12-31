@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.DTOs.GetDTOs;
 using API.Interfaces;
 using API.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +20,27 @@ namespace API.Controllers
     {
         private readonly DataContext _context;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public TestingController(DataContext context, UserManager<AppUser> userManager)
+        public TestingController(DataContext context, UserManager<AppUser> userManager, IMapper mapper)
         {
             _context = context;
             _userManager = userManager;
+            _mapper = mapper;
+        }
+
+        [HttpPost("TestShowTime")]
+        public async Task<ActionResult> TestShowTime()
+        {
+            Movie movie = await _context.Movies.FirstOrDefaultAsync();
+            Venue venue = await _context.Venues.FirstOrDefaultAsync();
+            DateTime dateTime = DateTime.Now.AddHours(9);
+
+            ShowTime showTime = new ShowTime() {Movie = movie, Venue = venue, MovieId = movie.Id, StartTime = dateTime};
+
+            _context.Add(showTime);
+            await _context.SaveChangesAsync();
+            return Ok(_mapper.Map<ShowTime, ShowTimeGetDto>(showTime));
         }
 
 

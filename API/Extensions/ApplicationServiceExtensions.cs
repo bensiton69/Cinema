@@ -24,6 +24,7 @@ namespace API.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IVenueRepository, VenueRepository>();
+            services.AddScoped<IShowTimeRepository, ShowTimeRepository>();
             services.AddDbContextPool<DataContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("CinemaDBConnection")));
 

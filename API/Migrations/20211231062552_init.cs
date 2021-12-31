@@ -184,7 +184,7 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShowTime",
+                name: "ShowTimes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -232,7 +232,7 @@ namespace API.Migrations
                     table.ForeignKey(
                         name: "FK_Reservations_ShowTime_ShowTimeId",
                         column: x => x.ShowTimeId,
-                        principalTable: "ShowTime",
+                        principalTable: "ShowTimes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -315,12 +315,12 @@ namespace API.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShowTime_MovieId",
-                table: "ShowTime",
+                table: "ShowTimes",
                 column: "MovieId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShowTime_VenueId",
-                table: "ShowTime",
+                table: "ShowTimes",
                 column: "VenueId");
         }
 
@@ -354,7 +354,7 @@ namespace API.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "ShowTime");
+                name: "ShowTimes");
 
             migrationBuilder.DropTable(
                 name: "Movies");
