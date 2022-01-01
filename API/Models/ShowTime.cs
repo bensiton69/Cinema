@@ -7,9 +7,10 @@ namespace API.Models
     {
         public Guid Id { get; set; }
         public DateTime StartTime { get; set; }
-        public Venue Venue { get; set; }
         public Movie Movie { get; set; }
         public Guid MovieId { get; set; }
+        public Venue Venue { get; set; }
+        public int VenueId { get; set; }
 
     }
 }

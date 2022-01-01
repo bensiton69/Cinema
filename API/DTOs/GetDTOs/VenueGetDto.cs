@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
 
-namespace API.Models
+namespace API.DTOs.GetDTOs
 {
-    public class Venue
+    public class VenueGetDto
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int VenueNumber { get; set; }
         public int NumberOfRows { get; set; }
         public int NumberOfCols { get; set; }
         public int NumberOfSeats { get; set; }
 
-        public ICollection<ShowTime> ShowTimes { get; set; }
+        public ICollection<KeyValuePairDto> ShowTimes { get; set; }
 
         //public ICollection<Seat> AvailableSeats { get; set; }
         //public ICollection<Seat> UnavailableSeats { get; set; }
         //public ICollection<Seat> HandicappedSeats { get; set; }
 
-        public Venue()
+        public VenueGetDto()
         {
-            ShowTimes = new List<ShowTime>();
+            ShowTimes = new List<KeyValuePairDto>();
             //AvailableSeats = new List<Seat>();
             //UnavailableSeats = new List<Seat>();
             //HandicappedSeats = new List<Seat>();

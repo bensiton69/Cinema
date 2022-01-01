@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using API.DTOs;
+using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
@@ -20,9 +22,12 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<Movie>> GetAllMovies()
+        public async Task<IEnumerable<MovieGetDto>> GetAllMovies()
         {
-            return await _context.Movies.ToListAsync();
+            var movies = await _context.Movies
+                .Include(m => m.ShowTimes)
+                .ToListAsync();
+            return _mapper.Map<List<Movie>, List<MovieGetDto>>(movies);
         }
 
         public async Task<Movie> GetMovie(Guid id)

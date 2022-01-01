@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
@@ -20,9 +21,12 @@ namespace API.Data
             _context = context;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<Venue>> GetAllVenues()
+        public async Task<List<VenueGetDto>> GetAllVenues()
         {
-            return await _context.Venues.ToListAsync();
+            List<Venue> venues = await _context.Venues
+                .Include(v => v.ShowTimes)
+                .ToListAsync();
+            return _mapper.Map<List<Venue>, List<VenueGetDto>>(venues);
         }
 
         public async Task<Venue> GetVenue(Guid id)

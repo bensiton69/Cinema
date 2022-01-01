@@ -36,7 +36,7 @@ namespace API.Controllers
             Venue venue = await _context.Venues.FirstOrDefaultAsync();
             DateTime dateTime = DateTime.Now.AddHours(9);
 
-            ShowTime showTime = new ShowTime() {Movie = movie, Venue = venue, MovieId = movie.Id, StartTime = dateTime};
+            ShowTime showTime = new ShowTime() {Movie = movie, Venue = venue, MovieId = movie.Id, StartTime = dateTime, VenueId = venue.VenueNumber};
 
             _context.Add(showTime);
             await _context.SaveChangesAsync();

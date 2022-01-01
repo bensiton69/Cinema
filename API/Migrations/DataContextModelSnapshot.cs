@@ -187,7 +187,7 @@ namespace API.Migrations
 
                     b.HasIndex("ShowTimeId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservation");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -230,8 +230,8 @@ namespace API.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("VenueId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("VenueId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -244,9 +244,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Venue", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("VenueNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("NumberOfCols")
                         .HasColumnType("int");
@@ -254,10 +253,10 @@ namespace API.Migrations
                     b.Property<int>("NumberOfRows")
                         .HasColumnType("int");
 
-                    b.Property<int>("VenueNumber")
+                    b.Property<int>("NumberOfSeats")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("VenueNumber");
 
                     b.ToTable("Venues");
                 });
@@ -410,8 +409,10 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.HasOne("API.Models.Venue", "Venue")
-                        .WithMany()
-                        .HasForeignKey("VenueId");
+                        .WithMany("ShowTimes")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Movie");
 
@@ -472,6 +473,11 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Reservation", b =>
                 {
                     b.Navigation("Seats");
+                });
+
+            modelBuilder.Entity("API.Models.Venue", b =>
+                {
+                    b.Navigation("ShowTimes");
                 });
 
             modelBuilder.Entity("API.Models.CostumerUser", b =>

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211231062552_init")]
+    [Migration("20220101095436_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -189,7 +189,7 @@ namespace API.Migrations
 
                     b.HasIndex("ShowTimeId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservation");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -220,7 +220,7 @@ namespace API.Migrations
                     b.ToTable("Seat");
                 });
 
-            modelBuilder.Entity("API.Models.ShowTimes", b =>
+            modelBuilder.Entity("API.Models.ShowTime", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -232,8 +232,8 @@ namespace API.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("VenueId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("VenueId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -241,14 +241,13 @@ namespace API.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("ShowTimes");
+                    b.ToTable("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("VenueNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("NumberOfCols")
                         .HasColumnType("int");
@@ -256,10 +255,10 @@ namespace API.Migrations
                     b.Property<int>("NumberOfRows")
                         .HasColumnType("int");
 
-                    b.Property<int>("VenueNumber")
+                    b.Property<int>("NumberOfSeats")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("VenueNumber");
 
                     b.ToTable("Venues");
                 });
@@ -389,11 +388,11 @@ namespace API.Migrations
                         .WithMany("Reservations")
                         .HasForeignKey("CostumerUserId");
 
-                    b.HasOne("API.Models.ShowTimes", "ShowTimes")
+                    b.HasOne("API.Models.ShowTime", "ShowTime")
                         .WithMany()
                         .HasForeignKey("ShowTimeId");
 
-                    b.Navigation("ShowTimes");
+                    b.Navigation("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -403,7 +402,7 @@ namespace API.Migrations
                         .HasForeignKey("ReservationId");
                 });
 
-            modelBuilder.Entity("API.Models.ShowTimes", b =>
+            modelBuilder.Entity("API.Models.ShowTime", b =>
                 {
                     b.HasOne("API.Models.Movie", "Movie")
                         .WithMany("ShowTimes")
@@ -412,8 +411,10 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.HasOne("API.Models.Venue", "Venue")
-                        .WithMany()
-                        .HasForeignKey("VenueId");
+                        .WithMany("ShowTimes")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Movie");
 
@@ -474,6 +475,11 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Reservation", b =>
                 {
                     b.Navigation("Seats");
+                });
+
+            modelBuilder.Entity("API.Models.Venue", b =>
+                {
+                    b.Navigation("ShowTimes");
                 });
 
             modelBuilder.Entity("API.Models.CostumerUser", b =>

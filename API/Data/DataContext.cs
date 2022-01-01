@@ -14,7 +14,7 @@ namespace API.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<ShowTime> ShowTime { get; set; }
         public DbSet<Venue> Venues { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
+        //public DbSet<Reservation> Reservations { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
@@ -38,35 +38,7 @@ namespace API.Data
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
 
-            builder.Entity<Venue>()
-                .Ignore(v => v.AvailableSeats)
-                .Ignore(v => v.UnavailableSeats)
-                .Ignore(v => v.HandicappedSeats);
-
-            builder.Entity<ShowTime>();
-
-            //builder.Entity<Movie>()
-            //    .HasMany(m => m.ShowingIn);
-
-            //builder.Entity<Venue>()
-            //    .HasMany(v => v.AvailableSeats)
-            //    .WithOne();
-            //builder.Entity<Venue>()
-            //    .HasMany(v => v.UnavailableSeats)
-            //    .WithOne();
-            //builder.Entity<Venue>()
-            //    .HasMany(v => v.HandicappedSeats)
-            //    .WithOne();
-
-            //builder.Entity<Venue>()
-            //    .Navigation(v => v.AvailableSeats)
-            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
-            //builder.Entity<Venue>()
-            //    .Navigation(v => v.HandicappedSeats)
-            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
-            //builder.Entity<Venue>()
-            //    .Navigation(v => v.UnavailableSeats)
-            //    .UsePropertyAccessMode(PropertyAccessMode.Property);
+            builder.Entity<Venue>();
 
             builder.Entity<AdminUser>();
             builder.Entity<CostumerUser>();

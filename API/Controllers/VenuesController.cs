@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -25,7 +27,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<Venue>> GetVenues()
+        public Task<List<VenueGetDto>> GetVenues()
         {
             return _unitOfWork.VenueRepository.GetAllVenues();
         }
@@ -43,7 +45,7 @@ namespace API.Controllers
             return venue;
         }
 
-
+        [Authorize(Roles = "AdminUser")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVenue(Venue venue)
         {
@@ -61,6 +63,7 @@ namespace API.Controllers
             return Ok(venue);
         }
 
+        [Authorize(Roles = "AdminUser")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVenue(Guid id)
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using API.Enums;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -55,14 +56,40 @@ namespace API.Data
 
             for (int i = 0; i < NumOfVenuesToSeed; i++)
             {
-                Venue venue = new Venue() { NumberOfCols = 7, NumberOfRows = 7, VenueNumber = i };
-
-                context.Venues.Add(venue);
-                context.Entry<Venue>(venue).State = EntityState.Detached;
+                Venue venue = new Venue() { NumberOfCols = 7, NumberOfRows = 7, NumberOfSeats = 49, VenueNumber = i + 1 };
+                await context.AddAsync(venue);
+                await context.SaveChangesAsync();
             }
+        }
 
-            context.SaveChanges();
+        public static async Task SeedMovies(DataContext context)
+        {
+            if (await context.Movies.AnyAsync()) return;
 
+            List<Movie> movies = new List<Movie>();
+
+            movies.Add(new Movie()
+            {
+                Director = "benny",
+                Duration = 126,
+                Genre = eGenre.Action,
+                ProductionYear = 1997,
+                Title = "Benny and the thieves"
+            });
+            movies.Add(new Movie()
+            {
+                Director = "David",
+                Duration = 153,
+                Genre = eGenre.Mystery,
+                ProductionYear = 2005,
+                Title = "Harry Potter and the order of the phoenix"
+            });
+
+            foreach (Movie movie in movies)
+            {
+                await context.AddAsync(movie);
+                await context.SaveChangesAsync();
+            }
         }
 
     }

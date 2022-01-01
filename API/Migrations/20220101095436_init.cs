@@ -67,14 +67,14 @@ namespace API.Migrations
                 name: "Venues",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VenueNumber = table.Column<int>(type: "int", nullable: false),
                     NumberOfRows = table.Column<int>(type: "int", nullable: false),
-                    NumberOfCols = table.Column<int>(type: "int", nullable: false)
+                    NumberOfCols = table.Column<int>(type: "int", nullable: false),
+                    NumberOfSeats = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Venues", x => x.Id);
+                    table.PrimaryKey("PK_Venues", x => x.VenueNumber);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,13 +184,13 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShowTimes",
+                name: "ShowTime",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VenueId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,12 +205,12 @@ namespace API.Migrations
                         name: "FK_ShowTime_Venues_VenueId",
                         column: x => x.VenueId,
                         principalTable: "Venues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "VenueNumber",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reservations",
+                name: "Reservation",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -222,17 +222,17 @@ namespace API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservations", x => x.Id);
+                    table.PrimaryKey("PK_Reservation", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reservations_AspNetUsers_CostumerUserId",
+                        name: "FK_Reservation_AspNetUsers_CostumerUserId",
                         column: x => x.CostumerUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Reservations_ShowTime_ShowTimeId",
+                        name: "FK_Reservation_ShowTime_ShowTimeId",
                         column: x => x.ShowTimeId,
-                        principalTable: "ShowTimes",
+                        principalTable: "ShowTime",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -252,9 +252,9 @@ namespace API.Migrations
                 {
                     table.PrimaryKey("PK_Seat", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Seat_Reservations_ReservationId",
+                        name: "FK_Seat_Reservation_ReservationId",
                         column: x => x.ReservationId,
-                        principalTable: "Reservations",
+                        principalTable: "Reservation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -299,13 +299,13 @@ namespace API.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_CostumerUserId",
-                table: "Reservations",
+                name: "IX_Reservation_CostumerUserId",
+                table: "Reservation",
                 column: "CostumerUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_ShowTimeId",
-                table: "Reservations",
+                name: "IX_Reservation_ShowTimeId",
+                table: "Reservation",
                 column: "ShowTimeId");
 
             migrationBuilder.CreateIndex(
@@ -315,12 +315,12 @@ namespace API.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShowTime_MovieId",
-                table: "ShowTimes",
+                table: "ShowTime",
                 column: "MovieId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShowTime_VenueId",
-                table: "ShowTimes",
+                table: "ShowTime",
                 column: "VenueId");
         }
 
@@ -348,13 +348,13 @@ namespace API.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "Reservation");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "ShowTimes");
+                name: "ShowTime");
 
             migrationBuilder.DropTable(
                 name: "Movies");

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
@@ -25,7 +26,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Movie>> GetMovies()
+        public async Task<IEnumerable<MovieGetDto>> GetMovies()
         {
             return await _unitOfWork.MovieRepository.GetAllMovies();
         }
