@@ -29,6 +29,18 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("TestVenueSeats")]
+        public async Task<VenueGetDto> TestVenueSeats()
+        {
+            Venue venue = await _context.Venues
+                .Include(v =>v.Seats)
+                .Include(v => v.ShowTimes)
+                .ThenInclude(st => st.Movie)
+                .FirstOrDefaultAsync();
+            return _mapper.Map<Venue, VenueGetDto>(venue);
+
+        }
+
         [HttpPost("TestShowTime")]
         public async Task<ActionResult> TestShowTime()
         {

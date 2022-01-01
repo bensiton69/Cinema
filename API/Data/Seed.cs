@@ -56,7 +56,7 @@ namespace API.Data
 
             for (int i = 0; i < NumOfVenuesToSeed; i++)
             {
-                Venue venue = new Venue() { NumberOfCols = 7, NumberOfRows = 7, NumberOfSeats = 49, VenueNumber = i + 1 };
+                Venue venue = new Venue() {VenueNumber = i + 1 };
                 await context.AddAsync(venue);
                 await context.SaveChangesAsync();
             }

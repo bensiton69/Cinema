@@ -25,24 +25,30 @@ namespace API.Data
         {
             List<Venue> venues = await _context.Venues
                 .Include(v => v.ShowTimes)
+                .ThenInclude(st => st.Movie)
                 .ToListAsync();
             return _mapper.Map<List<Venue>, List<VenueGetDto>>(venues);
         }
 
-        public async Task<Venue> GetVenue(Guid id)
+        public async Task<VenueGetDto> GetVenue(int id)
         {
-            return await _context.Venues.FindAsync(id);
+            Venue venue = await  _context.Venues
+                .Include(v => v.ShowTimes)
+                    .ThenInclude(st => st.Movie)
+                .FirstOrDefaultAsync(v => v.VenueNumber == id);
+            return _mapper.Map<Venue, VenueGetDto>(venue);
         }
 
-        public Venue Add(VenuePostDto venuePostDto)
+        public VenueGetDto Add(VenuePostDto venuePostDto)
         {
             Venue venue = _mapper.Map<VenuePostDto, Venue>(venuePostDto);
             _context.Venues.AddAsync(venue);
-            return venue;
+            return _mapper.Map<Venue, VenueGetDto>(venue);
         }
 
-        public void Remove(Venue venue)
+        public async void Remove(int venueId)
         {
+            Venue venue = await _context.Venues.FindAsync(venueId);
             _context.Remove(venue);
         }
 

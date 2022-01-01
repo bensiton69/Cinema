@@ -10,9 +10,10 @@ namespace API.Interfaces
     public interface IVenueRepository
     {
         Task<List<VenueGetDto>> GetAllVenues();
-        Task<Venue> GetVenue(Guid id);
-        Venue Add(VenuePostDto venuePostDto);
-        void Remove(Venue venue);
+        Task<VenueGetDto> GetVenue(int id);
+        VenueGetDto Add(VenuePostDto venuePostDto);
+        void Remove(int venueId);
         void UpdateVenue(Venue venue);
+        bool VenueExists(int id);
     }
 }

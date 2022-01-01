@@ -22,7 +22,8 @@ namespace API.Mapping
                 .ForMember(s => s.VenueNumber, opt => opt.MapFrom(s => s.Venue.VenueNumber));
             CreateMap<Movie, MoviePostDto>();
             CreateMap<Movie, MovieGetDto>();
-            CreateMap<Venue, VenueGetDto>();
+            CreateMap<Venue, VenueGetDto>()
+                .ForMember(vgd => vgd.ShowTimes, opt => opt.MapFrom(v =>v.ShowTimes));
 
             CreateMap<ShowTime, KeyValuePairDto>()
                 .ForMember(kvp => kvp.Name, opt => opt.MapFrom(st => "Show time of " + st.Movie.Title));

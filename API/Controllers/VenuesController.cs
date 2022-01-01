@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using API.Data;
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
@@ -33,7 +28,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Venue>> GetVenue(Guid id)
+        public async Task<ActionResult<VenueGetDto>> GetVenue(int id)
         {
             var venue = await _unitOfWork.VenueRepository.GetVenue(id);
 
@@ -55,9 +50,9 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Venue>> PostVenue(VenuePostDto venuePostDto)
+        public async Task<ActionResult<VenueGetDto>> PostVenue(VenuePostDto venuePostDto)
         {
-            Venue venue = _unitOfWork.VenueRepository.Add(venuePostDto);
+            VenueGetDto venue = _unitOfWork.VenueRepository.Add(venuePostDto);
             await _unitOfWork.CompleteAsync();
 
             return Ok(venue);
@@ -65,16 +60,14 @@ namespace API.Controllers
 
         [Authorize(Roles = "AdminUser")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVenue(Guid id)
+        public async Task<IActionResult> DeleteVenue(int id)
         {
-            // TODO: use isVenueExists instead
-            Venue venue = await _unitOfWork.VenueRepository.GetVenue(id);
-            if (venue == null)
+            if(_unitOfWork.VenueRepository.VenueExists(id) == false)
             {
                 return NotFound();
             }
 
-            _unitOfWork.VenueRepository.Remove(venue);
+            _unitOfWork.VenueRepository.Remove(id);
             await _unitOfWork.CompleteAsync();
 
             return NoContent();

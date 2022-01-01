@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using API.Models;
 
 namespace API.DTOs.GetDTOs
 {
@@ -10,6 +11,8 @@ namespace API.DTOs.GetDTOs
         public int NumberOfSeats { get; set; }
 
         public ICollection<KeyValuePairDto> ShowTimes { get; set; }
+        public ICollection<Seat> Seats { get; set; }
+
 
         //public ICollection<Seat> AvailableSeats { get; set; }
         //public ICollection<Seat> UnavailableSeats { get; set; }
@@ -18,6 +21,7 @@ namespace API.DTOs.GetDTOs
         public VenueGetDto()
         {
             ShowTimes = new List<KeyValuePairDto>();
+            Seats = new List<Seat>();
             //AvailableSeats = new List<Seat>();
             //UnavailableSeats = new List<Seat>();
             //HandicappedSeats = new List<Seat>();

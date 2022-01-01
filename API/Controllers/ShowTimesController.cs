@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using API.Data;
+using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
@@ -24,21 +21,21 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<ShowTime>> GetShowTime()
+        public Task<IEnumerable<ShowTimeGetDto>> GetShowTime()
         {
             return _unitOfWork.ShowTimeRepository.GetAllShowTimes();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ShowTime>> GetShowTime(Guid id)
+        public async Task<ActionResult<ShowTimeGetDto>> GetShowTime(Guid id)
         {
-            var showTime = await _unitOfWork.ShowTimeRepository.GetShowTime(id);
 
-            if (showTime == null)
+            if (_unitOfWork.ShowTimeRepository.ShowTimeExists(id) == false)
             {
                 return NotFound();
             }
 
+            var showTime = await _unitOfWork.ShowTimeRepository.GetShowTime(id);
             return showTime;
         }
 
@@ -54,22 +51,20 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<ShowTime>> PostShowTime(ShowTimePostDto showTimePostDto)
         {
-            ShowTime showTime = _unitOfWork.ShowTimeRepository.Add(showTimePostDto);
+            _unitOfWork.ShowTimeRepository.Add(showTimePostDto);
             await _unitOfWork.CompleteAsync();
-            return Ok(showTime);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShowTime(Guid id)
         {
-            // TODO: use isVenueExists instead
-            ShowTime showTime = await _unitOfWork.ShowTimeRepository.GetShowTime(id);
-            if (showTime == null)
+            if (_unitOfWork.ShowTimeRepository.ShowTimeExists(id) == false)
             {
                 return NotFound();
             }
 
-            _unitOfWork.ShowTimeRepository.Remove(showTime);
+            _unitOfWork.ShowTimeRepository.Remove(id);
             await _unitOfWork.CompleteAsync();
 
             return NoContent();

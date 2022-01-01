@@ -10,22 +10,38 @@ namespace API.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int VenueNumber { get; set; }
-        public int NumberOfRows { get; set; }
-        public int NumberOfCols { get; set; }
+
+        public int NumberOfRows { get; set; } = 7;
+        public int NumberOfCols { get; set; } = 7;
         public int NumberOfSeats { get; set; }
-
         public ICollection<ShowTime> ShowTimes { get; set; }
-
-        //public ICollection<Seat> AvailableSeats { get; set; }
-        //public ICollection<Seat> UnavailableSeats { get; set; }
-        //public ICollection<Seat> HandicappedSeats { get; set; }
+        public ICollection<Seat> Seats { get; set; }
 
         public Venue()
         {
             ShowTimes = new List<ShowTime>();
-            //AvailableSeats = new List<Seat>();
-            //UnavailableSeats = new List<Seat>();
-            //HandicappedSeats = new List<Seat>();
+            Seats = new List<Seat>();
+            initSeats();
+        }
+
+        private void initSeats()
+        {
+            NumberOfSeats = NumberOfCols * NumberOfRows;
+            for (int i = 0; i < NumberOfCols; i++)
+            {
+                for (int j = 0; j < NumberOfRows; j++)
+                {
+                    Seat seat = new Seat()
+                    {
+                        ColNumber = i,
+                        RowNumber = j,
+                        Id = Guid.NewGuid(),
+                        //IsAvailable = true,
+                        IsHandicapped = false
+                    };
+                    Seats.Add(seat);
+                }
+            }
         }
     }
 }
