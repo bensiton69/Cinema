@@ -10,6 +10,7 @@ using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
 using API.Models;
+using API.Models.Queries;
 using AutoMapper;
 
 namespace API.Controllers
@@ -29,6 +30,12 @@ namespace API.Controllers
         public async Task<IEnumerable<MovieGetDto>> GetMovies()
         {
             return await _unitOfWork.MovieRepository.GetAllMovies();
+        }
+
+        [HttpGet("WithQuery")]
+        public async Task<QueryResult<MovieGetDto>> GetMoviesWithQuery([FromQuery] MovieQuery movieQuery)
+        {
+            return await _unitOfWork.MovieRepository.GetAllMoviesWithQuery(movieQuery);
         }
 
         [HttpGet("{id}")]

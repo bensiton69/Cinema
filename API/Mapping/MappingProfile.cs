@@ -2,6 +2,7 @@
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Models;
+using API.Models.Queries;
 using AutoMapper;
 
 namespace API.Mapping
@@ -26,8 +27,12 @@ namespace API.Mapping
             CreateMap<Venue, VenueGetDto>()
                 .ForMember(vgd => vgd.ShowTimes, opt => opt.MapFrom(v =>v.ShowTimes));
 
+            CreateMap<QueryResult<Movie>, QueryResult<MovieGetDto>>()
+                .ForMember(qt => qt.Items, opt => opt.MapFrom(qs => qs.Items));
+
             CreateMap<ShowTime, KeyValuePairDto>()
-                .ForMember(kvp => kvp.Name, opt => opt.MapFrom(st => "Show time of " + st.Movie.Title));
+                .ForMember(kvp => kvp.Name, opt => opt.MapFrom(st => 
+                    "Show time of " + st.Movie.Title + ", in Venue: " +st.VenueId + ", at: " + st.StartTime.TimeOfDay));
             CreateMap<AppUser, KeyValuePairDto>()
                 .ForMember(kvp => kvp.Name, opt => opt.MapFrom(a => a.UserName));
 

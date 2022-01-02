@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using API.DTOs;
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
+using API.Extensions;
 using API.Interfaces;
 using API.Models;
+using API.Models.Queries;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +32,37 @@ namespace API.Data
                 .Include(m => m.ShowTimes)
                 .ToListAsync();
             return _mapper.Map<List<Movie>, List<MovieGetDto>>(movies);
+        }
+
+        public async Task<QueryResult<MovieGetDto>> GetAllMoviesWithQuery(MovieQuery queryObj)
+        {
+            var result = new QueryResult<Movie>();
+            var query = _context.Movies
+                .Include(m=> m.ShowTimes)
+                .AsQueryable();
+
+            //Filtering
+            if (String.IsNullOrEmpty(queryObj.Title) == false)
+                query = query.Where(m => m.Title == queryObj.Title);
+            if (queryObj.Genre.HasValue)
+                query = query.Where(m => (int)m.Genre == queryObj.Genre.Value);
+
+            var columnsMap = new Dictionary<string, Expression<Func<Movie, object>>>()
+            {
+                ["genre"] = m => m.Genre,
+                ["title"] = st => st.Title,
+            };
+
+            query = query.ApplyOrdering(queryObj, columnsMap);
+
+            result.TotalItems = await query.CountAsync();
+
+            query = query.ApplyPaging(queryObj);
+
+            result.Items = await query.ToListAsync();
+
+
+            return _mapper.Map<QueryResult<Movie>, QueryResult<MovieGetDto>>(result);
         }
 
         public async Task<Movie> GetMovie(Guid id)
