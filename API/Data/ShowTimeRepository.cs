@@ -24,6 +24,8 @@ namespace API.Data
         public async Task<IEnumerable<ShowTimeGetDto>> GetAllShowTimes()
         {
             List<ShowTime> showTimes = await _context.ShowTime
+                .Include(st=> st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
                 .Include(st => st.Movie)
                 .Include(st => st.Venue)
                 .ToListAsync();
@@ -42,13 +44,28 @@ namespace API.Data
 
         }
 
-        public ShowTime Add(ShowTimePostDto showTimePostDto)
+        public async Task<ShowTime> Add(ShowTimePostDto showTimePostDto)
         {
             ShowTime showTime = _mapper.Map<ShowTimePostDto, ShowTime>(showTimePostDto);
-            //Trying to create shallow copy:
-            _context.Add(showTime);
+            showTime.SeatPackages = initSeatPackage(showTimePostDto.VenueId);
+            await _context.AddAsync(showTime);
             return showTime;
         }
+
+
+        //TODO: to service
+        private ICollection<SeatPackage> initSeatPackage(int VenueNumber)
+        {
+            Venue venue = _context.Venues.Include(v=> v.Seats).FirstOrDefault(v => v.VenueNumber == VenueNumber);
+            List<SeatPackage> seatPackages = new List<SeatPackage>();
+            foreach (Seat venueSeat in venue.Seats)
+            {
+                seatPackages.Add(new SeatPackage() { IsAvailable = true, Seat = venueSeat });
+            }
+
+            return seatPackages;
+        }
+
 
         public async void Remove(Guid id)
         {

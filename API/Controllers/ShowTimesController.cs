@@ -51,7 +51,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<ShowTime>> PostShowTime(ShowTimePostDto showTimePostDto)
         {
-            _unitOfWork.ShowTimeRepository.Add(showTimePostDto);
+            await _unitOfWork.ShowTimeRepository.Add(showTimePostDto);
             await _unitOfWork.CompleteAsync();
             return Ok();
         }

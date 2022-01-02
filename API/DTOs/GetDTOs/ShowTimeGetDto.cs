@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using API.Models;
 
 namespace API.DTOs.GetDTOs
@@ -10,5 +11,11 @@ namespace API.DTOs.GetDTOs
         public Guid MovieId { get; set; }
         public string MovieName { get; set; }
         public int VenueNumber { get; set; }
+        public ICollection<SeatPackage> SeatPackages { get; set; }
+
+        public ShowTimeGetDto()
+        {
+            SeatPackages = new List<SeatPackage>();
+        }
     }
 }

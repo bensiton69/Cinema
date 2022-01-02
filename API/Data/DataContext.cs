@@ -14,6 +14,7 @@ namespace API.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<ShowTime> ShowTime { get; set; }
         public DbSet<Venue> Venues { get; set; }
+        public DbSet<Seat> Seats{ get; set; }
         //public DbSet<Reservation> Reservations { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options)

@@ -24,6 +24,7 @@ namespace API.Data
         public async Task<List<VenueGetDto>> GetAllVenues()
         {
             List<Venue> venues = await _context.Venues
+                .Include(v => v.Seats)
                 .Include(v => v.ShowTimes)
                 .ThenInclude(st => st.Movie)
                 .ToListAsync();

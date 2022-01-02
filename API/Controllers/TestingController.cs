@@ -29,30 +29,198 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("TestVenueSeats")]
-        public async Task<VenueGetDto> TestVenueSeats()
+        [HttpGet("GetSeats")]
+        public async Task<IActionResult> GetSeats()
         {
-            Venue venue = await _context.Venues
-                .Include(v =>v.Seats)
-                .Include(v => v.ShowTimes)
-                .ThenInclude(st => st.Movie)
-                .FirstOrDefaultAsync();
-            return _mapper.Map<Venue, VenueGetDto>(venue);
-
+            return Ok(await _context.Seats.ToListAsync());
         }
+
+        [HttpGet("TestShallowness")]
+        public async Task<IActionResult> TestShallowness()
+        {
+            Dictionary<string, Seat> seatsDictionary = new Dictionary<string, Seat>();
+            
+
+            ShowTime showTime = await _context.ShowTime
+                .Include(st => st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
+                .FirstOrDefaultAsync();
+
+            Venue venue = await _context.Venues
+                .Include(v => v.Seats)
+                .FirstOrDefaultAsync();
+
+
+            Seat seatShowTime = showTime.SeatPackages.FirstOrDefault().Seat;
+            Seat seatVenue = venue.Seats.FirstOrDefault(s => s.Id == seatShowTime.Id);
+            seatsDictionary.Add("Before: Seat from ShowTime:", seatShowTime.ShallowCopy());
+            seatsDictionary.Add("Before: Seat from venue:", seatVenue.ShallowCopy());
+
+            venue.Seats.FirstOrDefault(s => s.RowNumber == 0 && s.ColNumber == 0).IsHandicapped = true;
+
+            seatsDictionary.Add("After: Seat from ShowTime:", seatShowTime);
+            seatsDictionary.Add("After: Seat from venue:", seatVenue);
+
+            return Ok(seatsDictionary);
+        }
+
 
         [HttpPost("TestShowTime")]
         public async Task<ActionResult> TestShowTime()
         {
             Movie movie = await _context.Movies.FirstOrDefaultAsync();
-            Venue venue = await _context.Venues.FirstOrDefaultAsync();
-            DateTime dateTime = DateTime.Now.AddHours(9);
+            Venue venue = await _context.Venues.Include(v=> v.Seats).FirstOrDefaultAsync(v=>v.VenueNumber==5);
+            DateTime dateTime = DateTime.Now.AddHours(15);
 
-            ShowTime showTime = new ShowTime() {Movie = movie, Venue = venue, MovieId = movie.Id, StartTime = dateTime, VenueId = venue.VenueNumber};
+            ShowTime showTime = new ShowTime()
+            {
+                Movie = movie,
+                Venue = venue, 
+                MovieId = movie.Id, 
+                StartTime = dateTime, 
+                SeatPackages = initSeatPackage(ref venue),
+                VenueId = venue.VenueNumber
+            };
 
             _context.Add(showTime);
             await _context.SaveChangesAsync();
             return Ok(_mapper.Map<ShowTime, ShowTimeGetDto>(showTime));
+        }
+
+        [HttpGet("TestVenueCopyFromShowTimes")]
+        public async Task<IActionResult> TestVenueCopyFromShowTimes()
+        {
+            Dictionary<string, Seat> seatsDictionary = new Dictionary<string, Seat>();
+            List<ShowTime> showTimes = await _context.ShowTime
+                .Include(st => st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
+                .Include(st => st.Movie)
+                .Include(st => st.Venue)
+                .ToListAsync();
+
+            Venue venue = await _context.Venues
+                .Include(v => v.Seats)
+                .FirstOrDefaultAsync(x => x.VenueNumber == showTimes[0].VenueId);
+
+            
+            seatsDictionary.Add("Seat from venue:", venue.Seats.FirstOrDefault());
+            seatsDictionary.Add("Seat from showtime.SeatPackage:", showTimes
+                    .FirstOrDefault()
+                    .SeatPackages.FirstOrDefault()
+                    .Seat);
+
+
+            return Ok(seatsDictionary);
+        }
+
+        [HttpGet("TestVenueCopy")]
+        public async Task<IActionResult> TestVenueCopy()
+        {
+            Dictionary<string, VenueGetDto> venuesDictionary = new Dictionary<string, VenueGetDto>();
+
+            Venue v1 = await _context.Venues
+                .Include(v => v.Seats)
+                .Include(v => v.ShowTimes)
+                .ThenInclude(st => st.Movie)
+                .FirstOrDefaultAsync();
+
+            Venue v2 = v1.ShallowCopy();
+            Venue v3 = _context.Venues
+                .AsNoTracking()
+                .Include(v => v.Seats)
+                .Include(v => v.ShowTimes)
+                .ThenInclude(st => st.Movie)
+                .Single(v => v.VenueNumber == v1.VenueNumber);
+
+
+            //init all seats of v1 and v2 to isHandicapped = true:
+            foreach (Seat seat in v2.Seats)
+            {
+                //seat.IsAvailable = true;
+                seat.IsHandicapped = true;
+            }
+            foreach (Seat seat in v1.Seats)
+            {
+                //seat.IsAvailable = false;
+                seat.IsHandicapped = false;
+            }
+
+            foreach (Seat seat in v3.Seats)
+            {
+                //seat.IsAvailable = true;
+                seat.IsHandicapped = false;
+            }
+
+            venuesDictionary.Add("Before: v1:", _mapper.Map<Venue, VenueGetDto>(v1));
+            venuesDictionary.Add("Before: v2:", _mapper.Map<Venue, VenueGetDto>(v2));
+            venuesDictionary.Add("Before: v3:", _mapper.Map<Venue, VenueGetDto>(v3));
+
+            //foreach (Seat seat in v2.Seats)
+            //{
+            //    seat.IsHandicapped = true;
+            //}
+
+            //venuesDictionary.Add("After: v1:", _mapper.Map<Venue, VenueGetDto>(v1));
+            //venuesDictionary.Add("After: v2:", _mapper.Map<Venue, VenueGetDto>(v2));
+
+            return Ok(venuesDictionary);
+
+        }
+
+        [HttpGet("TestVenueSeats")]
+        public async Task<IActionResult> TestVenueSeats()
+        {
+            Dictionary<string, Seat> dictionarySeats = new Dictionary<string, Seat>();
+
+            Venue v1 = await _context.Venues
+                .Include(v =>v.Seats)
+                .Include(v => v.ShowTimes)
+                .ThenInclude(st => st.Movie)
+                .FirstOrDefaultAsync();
+
+            Seat seatFromV1 = v1.Seats.FirstOrDefault();
+
+            ShowTime showTime = await _context.ShowTime
+                .Include(st => st.Venue)
+                .ThenInclude(v=> v.Seats)
+                .FirstOrDefaultAsync();
+
+            Seat seat = showTime.Venue.Seats.FirstOrDefault();
+
+            if (seat == null)
+                return BadRequest();
+
+            Venue v2 = v1;
+            Seat seatFromV2 = seat.ShallowCopy();
+            // Initialize all seats to true:
+
+            //seatFromV1.IsAvailable = true;
+            //seatFromV2.IsAvailable = true;
+            //seat.IsAvailable = true;
+
+            dictionarySeats.Add("Before: seat from show time: ", seat.ShallowCopy());
+            dictionarySeats.Add("Before: seat from venue", seatFromV1.ShallowCopy());
+            dictionarySeats.Add("Before: seat from venue 2", seatFromV2.ShallowCopy());
+
+            //seatFromV2.IsAvailable = false;
+            
+            dictionarySeats.Add("After: seat from show time: ", seat);
+            dictionarySeats.Add("After: seat from venue", seatFromV1);
+            dictionarySeats.Add("After: seat from venue 2", seatFromV2);
+            return Ok(dictionarySeats);
+
+        }
+
+
+        private ICollection<SeatPackage> initSeatPackage(ref Venue venue)
+        {
+            List<SeatPackage> seatPackages = new List<SeatPackage>();
+            foreach (Seat venueSeat in venue.Seats)
+            {
+                seatPackages.Add(new SeatPackage(){IsAvailable = true, Seat = venueSeat});
+            }
+
+            return seatPackages;
         }
 
 

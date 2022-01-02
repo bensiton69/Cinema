@@ -13,18 +13,10 @@ namespace API.DTOs.GetDTOs
         public ICollection<KeyValuePairDto> ShowTimes { get; set; }
         public ICollection<Seat> Seats { get; set; }
 
-
-        //public ICollection<Seat> AvailableSeats { get; set; }
-        //public ICollection<Seat> UnavailableSeats { get; set; }
-        //public ICollection<Seat> HandicappedSeats { get; set; }
-
         public VenueGetDto()
         {
             ShowTimes = new List<KeyValuePairDto>();
             Seats = new List<Seat>();
-            //AvailableSeats = new List<Seat>();
-            //UnavailableSeats = new List<Seat>();
-            //HandicappedSeats = new List<Seat>();
         }
     }
 }

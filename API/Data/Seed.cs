@@ -53,12 +53,31 @@ namespace API.Data
         public static async Task SeedVenues(DataContext context)
         {
             if (await context.Venues.AnyAsync()) return;
-
+            ICollection<Seat> seats = new List<Seat>();
+            
             for (int i = 0; i < NumOfVenuesToSeed; i++)
             {
-                Venue venue = new Venue() {VenueNumber = i + 1 };
+                Venue venue = new Venue() {VenueNumber = i + 1};
+                initSeats(venue.Seats);
                 await context.AddAsync(venue);
                 await context.SaveChangesAsync();
+            }
+        }
+
+        private static void initSeats(ICollection<Seat> Seats)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    Seat seat = new Seat()
+                    {
+                        ColNumber = i,
+                        RowNumber = j,
+                        IsHandicapped = false
+                    };
+                    Seats.Add(seat);
+                }
             }
         }
 

@@ -11,7 +11,7 @@ namespace API.Interfaces
     {
         Task<IEnumerable<ShowTimeGetDto>> GetAllShowTimes();
         Task<ShowTimeGetDto> GetShowTime(Guid id);
-        ShowTime Add(ShowTimePostDto showTimePostDto);
+        Task<ShowTime> Add(ShowTimePostDto showTimePostDto);
         void Remove(Guid id);
         void UpdateShowTime(ShowTime showTime);
         bool ShowTimeExists(Guid id);

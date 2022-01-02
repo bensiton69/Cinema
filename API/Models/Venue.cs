@@ -11,8 +11,8 @@ namespace API.Models
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int VenueNumber { get; set; }
 
-        public int NumberOfRows { get; set; } = 7;
-        public int NumberOfCols { get; set; } = 7;
+        public int NumberOfRows { get; set; } = 2;
+        public int NumberOfCols { get; set; } = 5;
         public int NumberOfSeats { get; set; }
         public ICollection<ShowTime> ShowTimes { get; set; }
         public ICollection<Seat> Seats { get; set; }
@@ -21,7 +21,6 @@ namespace API.Models
         {
             ShowTimes = new List<ShowTime>();
             Seats = new List<Seat>();
-            initSeats();
         }
 
         private void initSeats()
@@ -35,13 +34,16 @@ namespace API.Models
                     {
                         ColNumber = i,
                         RowNumber = j,
-                        Id = Guid.NewGuid(),
-                        //IsAvailable = true,
                         IsHandicapped = false
                     };
                     Seats.Add(seat);
                 }
             }
+        }
+
+        public Venue ShallowCopy()
+        {
+            return this.MemberwiseClone() as Venue;
         }
     }
 }
