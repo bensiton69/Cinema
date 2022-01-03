@@ -15,9 +15,11 @@ namespace API.Mapping
             CreateMap<MoviePostDto, Movie>();
             CreateMap<VenuePostDto, Venue>();
             CreateMap<ShowTimePostDto, ShowTime>();
+            CreateMap<ReservationPostDto, Reservation>()
+                .ForMember(r => r.SeatsPackages, opt=> opt.MapFrom(rpt => rpt.SeatPackagesId));
 
-
-
+            CreateMap<Reservation, ReservationGetDto>()
+                .ForMember(rgd => rgd.ShowTimeGetDto, opt => opt.MapFrom(r => r.ShowTime));
             CreateMap<ShowTime, ShowTimeGetDto > ()
                 .ForMember(s=> s.SeatPackages, opt => opt.MapFrom(s=>s.SeatPackages))
                 .ForMember(s => s.MovieName, opt => opt.MapFrom(s=> s.Movie.Title))

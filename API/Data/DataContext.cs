@@ -12,10 +12,11 @@ namespace API.Data
         , IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public DbSet<Movie> Movies { get; set; }
-        public DbSet<ShowTime> ShowTime { get; set; }
+        public DbSet<ShowTime> ShowTimes { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Seat> Seats{ get; set; }
-        //public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<SeatPackage> SeatPackages { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
@@ -44,7 +45,6 @@ namespace API.Data
             builder.Entity<AdminUser>();
             builder.Entity<CostumerUser>();
         }
-
     }
 
 }

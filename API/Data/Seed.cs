@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using API.DTOs.GetDTOs;
 using API.Enums;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
@@ -64,22 +65,6 @@ namespace API.Data
             }
         }
 
-        private static void initSeats(ICollection<Seat> Seats)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    Seat seat = new Seat()
-                    {
-                        ColNumber = i,
-                        RowNumber = j,
-                        IsHandicapped = false
-                    };
-                    Seats.Add(seat);
-                }
-            }
-        }
 
         public static async Task SeedMovies(DataContext context)
         {
@@ -109,6 +94,56 @@ namespace API.Data
                 await context.AddAsync(movie);
                 await context.SaveChangesAsync();
             }
+        }
+
+        public static async Task SeedShowTimes(DataContext _context)
+        {
+            if (await _context.ShowTimes.AnyAsync()) return;
+
+            Movie movie = await _context.Movies.FirstOrDefaultAsync();
+            Venue venue = await _context.Venues.Include(v => v.Seats).FirstOrDefaultAsync(v => v.VenueNumber == 5);
+            DateTime dateTime = DateTime.Now.AddHours(15);
+
+            ShowTime showTime = new ShowTime()
+            {
+                Movie = movie,
+                Venue = venue,
+                MovieId = movie.Id,
+                StartTime = dateTime,
+                SeatPackages = initSeatPackage(ref venue),
+                VenueId = venue.VenueNumber
+            };
+
+            _context.Add(showTime);
+            await _context.SaveChangesAsync();
+            
+        }
+
+        private static void initSeats(ICollection<Seat> Seats)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    Seat seat = new Seat()
+                    {
+                        ColNumber = i,
+                        RowNumber = j,
+                        IsHandicapped = false
+                    };
+                    Seats.Add(seat);
+                }
+            }
+        }
+        private static ICollection<SeatPackage> initSeatPackage(ref Venue venue)
+        {
+            List<SeatPackage> seatPackages = new List<SeatPackage>();
+            foreach (Seat venueSeat in venue.Seats)
+            {
+                seatPackages.Add(new SeatPackage() { IsAvailable = true, Seat = venueSeat });
+            }
+
+            return seatPackages;
         }
 
     }

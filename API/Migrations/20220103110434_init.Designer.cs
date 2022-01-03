@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220101095436_init")]
+    [Migration("20220103110434_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,7 +177,7 @@ namespace API.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("ShowTimeId")
+                    b.Property<Guid>("ShowTimeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartTime")
@@ -189,7 +189,7 @@ namespace API.Migrations
 
                     b.HasIndex("ShowTimeId");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -201,23 +201,49 @@ namespace API.Migrations
                     b.Property<int>("ColNumber")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("IsHandicapped")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsHandicapped")
+                    b.Property<int>("RowNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VenueNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VenueNumber");
+
+                    b.ToTable("Seats");
+                });
+
+            modelBuilder.Entity("API.Models.SeatPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("ReservationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("RowNumber")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SeatId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ShowTimeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("Seat");
+                    b.HasIndex("SeatId");
+
+                    b.HasIndex("ShowTimeId");
+
+                    b.ToTable("SeatPackages");
                 });
 
             modelBuilder.Entity("API.Models.ShowTime", b =>
@@ -241,7 +267,7 @@ namespace API.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("ShowTime");
+                    b.ToTable("ShowTimes");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
@@ -390,16 +416,35 @@ namespace API.Migrations
 
                     b.HasOne("API.Models.ShowTime", "ShowTime")
                         .WithMany()
-                        .HasForeignKey("ShowTimeId");
+                        .HasForeignKey("ShowTimeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
                 {
-                    b.HasOne("API.Models.Reservation", null)
+                    b.HasOne("API.Models.Venue", null)
                         .WithMany("Seats")
+                        .HasForeignKey("VenueNumber");
+                });
+
+            modelBuilder.Entity("API.Models.SeatPackage", b =>
+                {
+                    b.HasOne("API.Models.Reservation", null)
+                        .WithMany("SeatsPackages")
                         .HasForeignKey("ReservationId");
+
+                    b.HasOne("API.Models.Seat", "Seat")
+                        .WithMany()
+                        .HasForeignKey("SeatId");
+
+                    b.HasOne("API.Models.ShowTime", null)
+                        .WithMany("SeatPackages")
+                        .HasForeignKey("ShowTimeId");
+
+                    b.Navigation("Seat");
                 });
 
             modelBuilder.Entity("API.Models.ShowTime", b =>
@@ -474,11 +519,18 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Reservation", b =>
                 {
-                    b.Navigation("Seats");
+                    b.Navigation("SeatsPackages");
+                });
+
+            modelBuilder.Entity("API.Models.ShowTime", b =>
+                {
+                    b.Navigation("SeatPackages");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
                 {
+                    b.Navigation("Seats");
+
                     b.Navigation("ShowTimes");
                 });
 

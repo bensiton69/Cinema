@@ -23,7 +23,7 @@ namespace API.Data
         }
         public async Task<IEnumerable<ShowTimeGetDto>> GetAllShowTimes()
         {
-            List<ShowTime> showTimes = await _context.ShowTime
+            List<ShowTime> showTimes = await _context.ShowTimes
                 .Include(st=> st.SeatPackages)
                 .ThenInclude(sp => sp.Seat)
                 .Include(st => st.Movie)
@@ -35,7 +35,7 @@ namespace API.Data
 
         public async Task<ShowTimeGetDto> GetShowTime(Guid id)
         {
-            ShowTime showTime = await _context.ShowTime
+            ShowTime showTime = await _context.ShowTimes
                 .Include(st => st.Movie)
                 .Include(st => st.Venue)
                 .FirstOrDefaultAsync(st => st.Id == id);
@@ -69,7 +69,7 @@ namespace API.Data
 
         public async void Remove(Guid id)
         {
-            ShowTime showTime = await _context.ShowTime.FindAsync(id);
+            ShowTime showTime = await _context.ShowTimes.FindAsync(id);
             _context.Remove(showTime);
         }
 
@@ -80,7 +80,7 @@ namespace API.Data
 
         public bool ShowTimeExists(Guid id)
         {
-            return _context.ShowTime.Any(e => e.Id == id);
+            return _context.ShowTimes.Any(e => e.Id == id);
         }
     }
 }

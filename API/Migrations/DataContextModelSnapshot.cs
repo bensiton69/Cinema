@@ -175,7 +175,7 @@ namespace API.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("ShowTimeId")
+                    b.Property<Guid>("ShowTimeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartTime")
@@ -187,7 +187,7 @@ namespace API.Migrations
 
                     b.HasIndex("ShowTimeId");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
@@ -202,9 +202,6 @@ namespace API.Migrations
                     b.Property<bool>("IsHandicapped")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ReservationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("RowNumber")
                         .HasColumnType("int");
 
@@ -212,8 +209,6 @@ namespace API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReservationId");
 
                     b.HasIndex("VenueNumber");
 
@@ -229,6 +224,9 @@ namespace API.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("ReservationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("SeatId")
                         .HasColumnType("uniqueidentifier");
 
@@ -237,11 +235,13 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ReservationId");
+
                     b.HasIndex("SeatId");
 
                     b.HasIndex("ShowTimeId");
 
-                    b.ToTable("SeatPackage");
+                    b.ToTable("SeatPackages");
                 });
 
             modelBuilder.Entity("API.Models.ShowTime", b =>
@@ -265,7 +265,7 @@ namespace API.Migrations
 
                     b.HasIndex("VenueId");
 
-                    b.ToTable("ShowTime");
+                    b.ToTable("ShowTimes");
                 });
 
             modelBuilder.Entity("API.Models.Venue", b =>
@@ -414,17 +414,15 @@ namespace API.Migrations
 
                     b.HasOne("API.Models.ShowTime", "ShowTime")
                         .WithMany()
-                        .HasForeignKey("ShowTimeId");
+                        .HasForeignKey("ShowTimeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ShowTime");
                 });
 
             modelBuilder.Entity("API.Models.Seat", b =>
                 {
-                    b.HasOne("API.Models.Reservation", null)
-                        .WithMany("Seats")
-                        .HasForeignKey("ReservationId");
-
                     b.HasOne("API.Models.Venue", null)
                         .WithMany("Seats")
                         .HasForeignKey("VenueNumber");
@@ -432,6 +430,10 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.SeatPackage", b =>
                 {
+                    b.HasOne("API.Models.Reservation", null)
+                        .WithMany("SeatsPackages")
+                        .HasForeignKey("ReservationId");
+
                     b.HasOne("API.Models.Seat", "Seat")
                         .WithMany()
                         .HasForeignKey("SeatId");
@@ -515,7 +517,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Models.Reservation", b =>
                 {
-                    b.Navigation("Seats");
+                    b.Navigation("SeatsPackages");
                 });
 
             modelBuilder.Entity("API.Models.ShowTime", b =>

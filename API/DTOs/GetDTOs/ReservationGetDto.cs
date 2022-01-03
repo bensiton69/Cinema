@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using API.Models;
 
-namespace API.Models
+namespace API.DTOs.GetDTOs
 {
-    public class Reservation
+    public class ReservationGetDto
     {
         public Guid Id { get; set; }
         public Double Price { get; set; }
         public ICollection<SeatPackage> SeatsPackages { get; set; }
-        public ShowTime ShowTime { get; set; }
-        public Guid ShowTimeId { get; set; }
+        public ShowTimeGetDto ShowTimeGetDto { get; set; }
         public DateTime OrderTime { get; set; }
         public DateTime StartTime { get; set; }
 
-        public Reservation()
+        public ReservationGetDto()
         {
             SeatsPackages = new List<SeatPackage>();
         }

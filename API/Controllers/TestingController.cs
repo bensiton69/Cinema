@@ -29,6 +29,52 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("GetReservations")]
+        public async Task<IActionResult> GetReservations()
+        {
+            return Ok(_mapper.Map<List<Reservation>, List<ReservationGetDto>>(await _context.Reservations
+                .Include(r => r.ShowTime)
+                .Include(r=> r.SeatsPackages)
+                .ToListAsync()));
+        }
+
+        [HttpGet("GetNumberOfSeatPackages")]
+        public async Task<IActionResult> GetNumberOfSeatPackages()
+        {
+            return Ok(_context.SeatPackages.Count());
+        }
+
+        [HttpPost("PostReservations")]
+        public async Task<IActionResult> PostReservations()
+        {
+            ShowTime showTime = _context.ShowTimes
+                .Include(st => st.Venue)
+                .Include(st => st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
+                .FirstOrDefault();
+
+            List<SeatPackage> seatsPackages = new List<SeatPackage>();
+            seatsPackages.Add(showTime.SeatPackages.FirstOrDefault(sp=>sp.Seat.ColNumber==0&& sp.Seat.RowNumber == 0));
+            seatsPackages.Add(showTime.SeatPackages.FirstOrDefault(sp=>sp.Seat.ColNumber==0&& sp.Seat.RowNumber == 1));
+
+            foreach (SeatPackage seatsPackage in seatsPackages)
+            {
+                seatsPackage.IsAvailable = false;
+            }
+
+            Reservation reservation = new Reservation()
+            {
+                OrderTime = DateTime.Now,
+                ShowTimeId = showTime.Id,
+                SeatsPackages = seatsPackages,
+                Price = 3.75 * seatsPackages.Count,
+                StartTime = DateTime.Now.AddHours(12)
+            };
+            _context.Reservations.Add(reservation);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         [HttpGet("GetSeats")]
         public async Task<IActionResult> GetSeats()
         {
@@ -41,7 +87,7 @@ namespace API.Controllers
             Dictionary<string, Seat> seatsDictionary = new Dictionary<string, Seat>();
             
 
-            ShowTime showTime = await _context.ShowTime
+            ShowTime showTime = await _context.ShowTimes
                 .Include(st => st.SeatPackages)
                 .ThenInclude(sp => sp.Seat)
                 .FirstOrDefaultAsync();
@@ -53,12 +99,12 @@ namespace API.Controllers
 
             Seat seatShowTime = showTime.SeatPackages.FirstOrDefault().Seat;
             Seat seatVenue = venue.Seats.FirstOrDefault(s => s.Id == seatShowTime.Id);
-            seatsDictionary.Add("Before: Seat from ShowTime:", seatShowTime.ShallowCopy());
+            seatsDictionary.Add("Before: Seat from ShowTimes:", seatShowTime.ShallowCopy());
             seatsDictionary.Add("Before: Seat from venue:", seatVenue.ShallowCopy());
 
             venue.Seats.FirstOrDefault(s => s.RowNumber == 0 && s.ColNumber == 0).IsHandicapped = true;
 
-            seatsDictionary.Add("After: Seat from ShowTime:", seatShowTime);
+            seatsDictionary.Add("After: Seat from ShowTimes:", seatShowTime);
             seatsDictionary.Add("After: Seat from venue:", seatVenue);
 
             return Ok(seatsDictionary);
@@ -91,7 +137,7 @@ namespace API.Controllers
         public async Task<IActionResult> TestVenueCopyFromShowTimes()
         {
             Dictionary<string, Seat> seatsDictionary = new Dictionary<string, Seat>();
-            List<ShowTime> showTimes = await _context.ShowTime
+            List<ShowTime> showTimes = await _context.ShowTimes
                 .Include(st => st.SeatPackages)
                 .ThenInclude(sp => sp.Seat)
                 .Include(st => st.Movie)
@@ -180,7 +226,7 @@ namespace API.Controllers
 
             Seat seatFromV1 = v1.Seats.FirstOrDefault();
 
-            ShowTime showTime = await _context.ShowTime
+            ShowTime showTime = await _context.ShowTimes
                 .Include(st => st.Venue)
                 .ThenInclude(v=> v.Seats)
                 .FirstOrDefaultAsync();
