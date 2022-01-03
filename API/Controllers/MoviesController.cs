@@ -53,9 +53,9 @@ namespace API.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(Guid id, Movie movie)
+        public async Task<IActionResult> PutMovie(Movie movie)
         {
-            _unitOfWork.MovieRepository.UpdateMovie(id, movie);
+            _unitOfWork.MovieRepository.UpdateMovie(movie);
             await _unitOfWork.CompleteAsync();
             return Ok(movie);
         }

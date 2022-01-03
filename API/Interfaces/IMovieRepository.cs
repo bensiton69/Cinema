@@ -16,6 +16,6 @@ namespace API.Interfaces
         Task<Movie> GetMovie(Guid id);
         Movie Add(MoviePostDto movie);
         void Remove(Movie movie);
-        void UpdateMovie(Guid id, Movie movie);
+        void UpdateMovie(Movie movie);
     }
 }

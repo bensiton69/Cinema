@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using API.DTOs.GetDTOs;
 using API.Enums;
+using API.Interfaces;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -51,15 +53,14 @@ namespace API.Data
             await userManager.AddToRolesAsync(admin, new[] { "AdminUser", "Moderator" });
         }
 
-        public static async Task SeedVenues(DataContext context)
+        public static async Task SeedVenues(DataContext context, ISeatManagerService seatManagerService)
         {
             if (await context.Venues.AnyAsync()) return;
-            ICollection<Seat> seats = new List<Seat>();
             
             for (int i = 0; i < NumOfVenuesToSeed; i++)
             {
                 Venue venue = new Venue() {VenueNumber = i + 1};
-                initSeats(venue.Seats);
+                seatManagerService.InitSeats(venue.Seats);
                 await context.AddAsync(venue);
                 await context.SaveChangesAsync();
             }
@@ -96,12 +97,12 @@ namespace API.Data
             }
         }
 
-        public static async Task SeedShowTimes(DataContext _context)
+        public static async Task SeedShowTimes(DataContext context, ISeatManagerService seatManagerService)
         {
-            if (await _context.ShowTimes.AnyAsync()) return;
+            if (await context.ShowTimes.AnyAsync()) return;
 
-            Movie movie = await _context.Movies.FirstOrDefaultAsync();
-            Venue venue = await _context.Venues.Include(v => v.Seats).FirstOrDefaultAsync(v => v.VenueNumber == 5);
+            Movie movie = await context.Movies.FirstOrDefaultAsync();
+            Venue venue = await context.Venues.Include(v => v.Seats).FirstOrDefaultAsync(v => v.VenueNumber == 5);
             DateTime dateTime = DateTime.Now.AddHours(15);
 
             ShowTime showTime = new ShowTime()
@@ -110,40 +111,51 @@ namespace API.Data
                 Venue = venue,
                 MovieId = movie.Id,
                 StartTime = dateTime,
-                SeatPackages = initSeatPackage(ref venue),
+                SeatPackages = seatManagerService.InitSeatPackage(ref venue),
                 VenueId = venue.VenueNumber
             };
 
-            _context.Add(showTime);
-            await _context.SaveChangesAsync();
+            context.Add(showTime);
+            await context.SaveChangesAsync();
             
         }
 
-        private static void initSeats(ICollection<Seat> Seats)
+        public static async Task SeedReservation(DataContext context)
         {
-            for (int i = 0; i < 2; i++)
+            if (await context.Reservations.AnyAsync()) return;
+
+            ShowTime showTime = context.ShowTimes
+                .Include(st => st.Venue)
+                .Include(st => st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
+                .FirstOrDefault();
+
+            List<SeatPackage> seatsPackages = new List<SeatPackage>();
+            if (showTime != null)
             {
-                for (int j = 0; j < 5; j++)
+                seatsPackages.Add(
+                    showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 0 && sp.Seat.RowNumber == 0));
+                seatsPackages.Add(
+                    showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 0 && sp.Seat.RowNumber == 1));
+
+                foreach (SeatPackage seatsPackage in seatsPackages)
                 {
-                    Seat seat = new Seat()
-                    {
-                        ColNumber = i,
-                        RowNumber = j,
-                        IsHandicapped = false
-                    };
-                    Seats.Add(seat);
+                    seatsPackage.IsAvailable = false;
                 }
-            }
-        }
-        private static ICollection<SeatPackage> initSeatPackage(ref Venue venue)
-        {
-            List<SeatPackage> seatPackages = new List<SeatPackage>();
-            foreach (Seat venueSeat in venue.Seats)
-            {
-                seatPackages.Add(new SeatPackage() { IsAvailable = true, Seat = venueSeat });
+
+                Reservation reservation = new Reservation()
+                {
+                    OrderTime = DateTime.Now,
+                    ShowTimeId = showTime.Id,
+                    SeatsPackages = seatsPackages,
+                    Price = 3.75 * seatsPackages.Count,
+                    StartTime = DateTime.Now.AddHours(12)
+                };
+                context.Reservations.Add(reservation);
             }
 
-            return seatPackages;
+            await context.SaveChangesAsync();
+
         }
 
     }

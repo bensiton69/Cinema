@@ -82,9 +82,7 @@ namespace API.Data
             _context.Remove(movie);
         }
 
-        //TODO: remove id from update
-
-        public void UpdateMovie(Guid id, Movie movie)
+        public void UpdateMovie(Movie movie)
         {
             _context.Entry(movie).State = EntityState.Modified;
         }

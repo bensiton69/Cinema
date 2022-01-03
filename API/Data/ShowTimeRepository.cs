@@ -15,11 +15,13 @@ namespace API.Data
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly ISeatManagerService _seatManagerService;
 
-        public ShowTimeRepository(DataContext context, IMapper mapper)
+        public ShowTimeRepository(DataContext context, IMapper mapper, ISeatManagerService seatManagerService)
         {
             _context = context;
             _mapper = mapper;
+            _seatManagerService = seatManagerService;
         }
         public async Task<IEnumerable<ShowTimeGetDto>> GetAllShowTimes()
         {
@@ -47,23 +49,9 @@ namespace API.Data
         public async Task<ShowTime> Add(ShowTimePostDto showTimePostDto)
         {
             ShowTime showTime = _mapper.Map<ShowTimePostDto, ShowTime>(showTimePostDto);
-            showTime.SeatPackages = initSeatPackage(showTimePostDto.VenueId);
+            showTime.SeatPackages = _seatManagerService.InitSeatPackage(showTimePostDto.VenueId, _context);
             await _context.AddAsync(showTime);
             return showTime;
-        }
-
-
-        //TODO: to service
-        private ICollection<SeatPackage> initSeatPackage(int VenueNumber)
-        {
-            Venue venue = _context.Venues.Include(v=> v.Seats).FirstOrDefault(v => v.VenueNumber == VenueNumber);
-            List<SeatPackage> seatPackages = new List<SeatPackage>();
-            foreach (Seat venueSeat in venue.Seats)
-            {
-                seatPackages.Add(new SeatPackage() { IsAvailable = true, Seat = venueSeat });
-            }
-
-            return seatPackages;
         }
 
 

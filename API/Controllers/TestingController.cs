@@ -21,12 +21,15 @@ namespace API.Controllers
         private readonly DataContext _context;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly ISeatManagerService _seatManagerService;
 
-        public TestingController(DataContext context, UserManager<AppUser> userManager, IMapper mapper)
+        public TestingController(DataContext context, UserManager<AppUser> userManager, IMapper mapper
+        , ISeatManagerService seatManagerService)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _seatManagerService = seatManagerService;
         }
 
         [HttpGet("GetReservations")]
@@ -99,8 +102,8 @@ namespace API.Controllers
 
             Seat seatShowTime = showTime.SeatPackages.FirstOrDefault().Seat;
             Seat seatVenue = venue.Seats.FirstOrDefault(s => s.Id == seatShowTime.Id);
-            seatsDictionary.Add("Before: Seat from ShowTimes:", seatShowTime.ShallowCopy());
-            seatsDictionary.Add("Before: Seat from venue:", seatVenue.ShallowCopy());
+            seatsDictionary.Add("Before: Seat from ShowTimes:", seatShowTime);
+            seatsDictionary.Add("Before: Seat from venue:", seatVenue);
 
             venue.Seats.FirstOrDefault(s => s.RowNumber == 0 && s.ColNumber == 0).IsHandicapped = true;
 
@@ -124,7 +127,7 @@ namespace API.Controllers
                 Venue = venue, 
                 MovieId = movie.Id, 
                 StartTime = dateTime, 
-                SeatPackages = initSeatPackage(ref venue),
+                SeatPackages = _seatManagerService.InitSeatPackage(ref venue),
                 VenueId = venue.VenueNumber
             };
 
@@ -170,7 +173,7 @@ namespace API.Controllers
                 .ThenInclude(st => st.Movie)
                 .FirstOrDefaultAsync();
 
-            Venue v2 = v1.ShallowCopy();
+            Venue v2 = v1;
             Venue v3 = _context.Venues
                 .AsNoTracking()
                 .Include(v => v.Seats)
@@ -237,16 +240,16 @@ namespace API.Controllers
                 return BadRequest();
 
             Venue v2 = v1;
-            Seat seatFromV2 = seat.ShallowCopy();
+            Seat seatFromV2 = seat;
             // Initialize all seats to true:
 
             //seatFromV1.IsAvailable = true;
             //seatFromV2.IsAvailable = true;
             //seat.IsAvailable = true;
 
-            dictionarySeats.Add("Before: seat from show time: ", seat.ShallowCopy());
-            dictionarySeats.Add("Before: seat from venue", seatFromV1.ShallowCopy());
-            dictionarySeats.Add("Before: seat from venue 2", seatFromV2.ShallowCopy());
+            dictionarySeats.Add("Before: seat from show time: ", seat);
+            dictionarySeats.Add("Before: seat from venue", seatFromV1);
+            dictionarySeats.Add("Before: seat from venue 2", seatFromV2);
 
             //seatFromV2.IsAvailable = false;
             
@@ -256,19 +259,6 @@ namespace API.Controllers
             return Ok(dictionarySeats);
 
         }
-
-
-        private ICollection<SeatPackage> initSeatPackage(ref Venue venue)
-        {
-            List<SeatPackage> seatPackages = new List<SeatPackage>();
-            foreach (Seat venueSeat in venue.Seats)
-            {
-                seatPackages.Add(new SeatPackage(){IsAvailable = true, Seat = venueSeat});
-            }
-
-            return seatPackages;
-        }
-
 
         [HttpPost("TestInterfaces")]
         public async Task<ActionResult> TestInterfaces()

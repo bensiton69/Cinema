@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Interfaces;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,14 +25,18 @@ namespace API
             var services = scope.ServiceProvider;
             try
             {
+                var venueManager = services.GetRequiredService<ISeatManagerService>();
                 var context = services.GetRequiredService<DataContext>();
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
                 await context.Database.MigrateAsync();
+
+                // The order is matter here:
                 await Seed.SeedUsers(userManager, roleManager);
-                await Seed.SeedVenues(context);
+                await Seed.SeedVenues(context, venueManager);
                 await Seed.SeedMovies(context);
-                await Seed.SeedShowTimes(context);
+                await Seed.SeedShowTimes(context, venueManager);
+                await Seed.SeedReservation(context);
             }
             catch (Exception ex)
             {

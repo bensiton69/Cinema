@@ -8,11 +8,5 @@ namespace API.Models
         public int RowNumber { get; set; }
         public int ColNumber { get; set; }
         public bool IsHandicapped { get; set; }
-
-        public Seat ShallowCopy()
-        {
-            return this.MemberwiseClone() as Seat;
-        }
-
     }
 }

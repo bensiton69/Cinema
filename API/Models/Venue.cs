@@ -22,28 +22,5 @@ namespace API.Models
             ShowTimes = new List<ShowTime>();
             Seats = new List<Seat>();
         }
-
-        private void initSeats()
-        {
-            NumberOfSeats = NumberOfCols * NumberOfRows;
-            for (int i = 0; i < NumberOfCols; i++)
-            {
-                for (int j = 0; j < NumberOfRows; j++)
-                {
-                    Seat seat = new Seat()
-                    {
-                        ColNumber = i,
-                        RowNumber = j,
-                        IsHandicapped = false
-                    };
-                    Seats.Add(seat);
-                }
-            }
-        }
-
-        public Venue ShallowCopy()
-        {
-            return this.MemberwiseClone() as Venue;
-        }
     }
 }
