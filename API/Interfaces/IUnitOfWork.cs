@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using API.Interfaces.IRepositories;
 
 namespace API.Interfaces
 {
@@ -8,6 +9,7 @@ namespace API.Interfaces
         IUserRepository UserRepository { get; }
         IVenueRepository VenueRepository { get; }
         IShowTimeRepository ShowTimeRepository { get; }
+        IReservationRepository ReservationRepository { get; }
         Task CompleteAsync();
 
     }

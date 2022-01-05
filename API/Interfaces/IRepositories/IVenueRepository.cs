@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Models;
 
-namespace API.Interfaces
+namespace API.Interfaces.IRepositories
 {
     public interface IVenueRepository
     {

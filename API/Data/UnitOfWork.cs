@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using API.Interfaces;
+using API.Interfaces.IRepositories;
 
 namespace API.Data
 {
@@ -10,19 +11,22 @@ namespace API.Data
         public IUserRepository UserRepository { get; }
         public IVenueRepository VenueRepository { get; }
         public IShowTimeRepository ShowTimeRepository { get; }
+        public IReservationRepository ReservationRepository { get; }
 
         public UnitOfWork(
             IMovieRepository movieRepository,
             DataContext context,
             IUserRepository userRepository,
             IVenueRepository venueRepository,
-            IShowTimeRepository showTimeRepository)
+            IShowTimeRepository showTimeRepository,
+            IReservationRepository reservationRepository)
         {
             _context = context;
             MovieRepository = movieRepository;
             UserRepository = userRepository;
             VenueRepository = venueRepository;
             ShowTimeRepository = showTimeRepository;
+            ReservationRepository = reservationRepository;
         }
 
         public async Task CompleteAsync()

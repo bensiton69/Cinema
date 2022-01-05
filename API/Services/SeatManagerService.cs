@@ -2,6 +2,7 @@
 using System.Linq;
 using API.Data;
 using API.Interfaces;
+using API.Interfaces.IServices;
 using API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ namespace API.Services
     {
         public void InitSeats(ICollection<Seat> seats)
         {
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 5; j++)
                 {

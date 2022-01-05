@@ -1,5 +1,7 @@
 ﻿using API.Data;
 using API.Interfaces;
+using API.Interfaces.IRepositories;
+using API.Interfaces.IServices;
 using API.Mapping;
 using API.Services;
 using AutoMapper;
@@ -22,8 +24,10 @@ namespace API.Extensions
             services.AddSingleton(mapper);
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddSingleton<IReservationService, ReservationService>();
             services.AddScoped<ISeatManagerService, SeatManagerService>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IVenueRepository, VenueRepository>();
             services.AddScoped<IShowTimeRepository, ShowTimeRepository>();

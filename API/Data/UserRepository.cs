@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.DTOs;
 using API.Interfaces;
+using API.Interfaces.IRepositories;
 using API.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;

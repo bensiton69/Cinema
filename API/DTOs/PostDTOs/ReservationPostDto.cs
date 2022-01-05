@@ -7,8 +7,7 @@ namespace API.DTOs.PostDTOs
     {
         public ICollection<Guid> SeatPackagesId { get; set; }
         public Guid ShowTimeId { get; set; }
-        public DateTime OrderTime { get; set; }
-        public DateTime StartTime { get; set; }
+        public Guid CostumerId { get; set; }
 
         public ReservationPostDto()
         {

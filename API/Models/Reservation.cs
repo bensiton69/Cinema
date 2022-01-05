@@ -7,6 +7,8 @@ namespace API.Models
     {
         public Guid Id { get; set; }
         public Double Price { get; set; }
+        public CostumerUser Costumer { get; set; }
+        public Guid CostumerId { get; set; }
         public ICollection<SeatPackage> SeatsPackages { get; set; }
         public ShowTime ShowTime { get; set; }
         public Guid ShowTimeId { get; set; }

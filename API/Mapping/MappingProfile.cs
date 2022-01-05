@@ -1,4 +1,5 @@
-﻿using API.DTOs;
+﻿using System;
+using API.DTOs;
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Models;
@@ -11,6 +12,9 @@ namespace API.Mapping
     {
         public MappingProfile()
         {
+            CreateMap<Guid, SeatPackage>()
+                .ForMember(sp => sp.Id, opt => opt.MapFrom(g => g));
+
             CreateMap<RegisterDto, AppUser>();
             CreateMap<MoviePostDto, Movie>();
             CreateMap<VenuePostDto, Venue>();
@@ -19,7 +23,7 @@ namespace API.Mapping
                 .ForMember(r => r.SeatsPackages, opt=> opt.MapFrom(rpt => rpt.SeatPackagesId));
 
             CreateMap<Reservation, ReservationGetDto>()
-                .ForMember(rgd => rgd.ShowTimeGetDto, opt => opt.MapFrom(r => r.ShowTime));
+                .ForMember(rgd => rgd.ShowTimeKeyValuePairDto, opt => opt.MapFrom(r => r.ShowTime));
             CreateMap<ShowTime, ShowTimeGetDto > ()
                 .ForMember(s=> s.SeatPackages, opt => opt.MapFrom(s=>s.SeatPackages))
                 .ForMember(s => s.MovieName, opt => opt.MapFrom(s=> s.Movie.Title))

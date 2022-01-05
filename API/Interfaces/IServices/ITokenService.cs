@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using API.Models;
 
-namespace API.Interfaces
+namespace API.Interfaces.IServices
 {
     public interface ITokenService
     {

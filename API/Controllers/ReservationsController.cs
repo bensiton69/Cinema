@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.DTOs.GetDTOs;
+using API.DTOs.PostDTOs;
+using API.Interfaces;
+using API.Interfaces.IRepositories;
+using API.Interfaces.IServices;
 using API.Models;
 using AutoMapper;
 
@@ -16,97 +20,61 @@ namespace API.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ReservationsController(DataContext context, IMapper mapper)
+        public ReservationsController(IUnitOfWork unitOfWork)
         {
-            _context = context;
-            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
-        // GET: api/Reservations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationGetDto>>> GetReservation()
+        public async Task<IEnumerable<ReservationGetDto>> GetReservation()
         {
-            return _mapper.Map<List<Reservation>, List<ReservationGetDto>>(await _context.Reservations.ToListAsync());
+            return await _unitOfWork.ReservationRepository.GetAllReservations();
         }
 
-        // GET: api/Reservations/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ReservationGetDto>> GetReservation(Guid id)
         {
-            var reservation = await _context.Reservations.FindAsync(id);
-
-            if (reservation == null)
+            if (_unitOfWork.ReservationRepository.ReservationExists(id) == false)
             {
                 return NotFound();
             }
 
-            return _mapper.Map<Reservation,ReservationGetDto>(reservation);
+            var reservation = await _unitOfWork.ReservationRepository.GetReservation(id);
+            return reservation;
         }
 
-        // PUT: api/Reservations/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutReservation(Guid id, Reservation reservation)
+        public async Task<IActionResult> PutReservation(Reservation reservation)
         {
-            if (id != reservation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(reservation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ReservationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            _unitOfWork.ReservationRepository.UpdateReservation(reservation);
+            await _unitOfWork.CompleteAsync();
+            return Ok();
         }
 
-        // POST: api/Reservations
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
-        public async Task<ActionResult<Reservation>> PostReservation(Reservation reservation)
+        public async Task<ActionResult<Reservation>> PostReservation(ReservationPostDto reservationPostDto)
         {
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetReservation", new { id = reservation.Id }, reservation);
+            ReservationGetDto reservationGetDto = await _unitOfWork.ReservationRepository.Add(reservationPostDto);
+            await _unitOfWork.CompleteAsync();
+            return Ok(reservationGetDto);
         }
 
-        // DELETE: api/Reservations/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(Guid id)
         {
-            var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation == null)
+            if (_unitOfWork.ReservationRepository.ReservationExists(id) == false)
             {
                 return NotFound();
             }
 
-            _context.Reservations.Remove(reservation);
-            await _context.SaveChangesAsync();
+            _unitOfWork.ReservationRepository.Remove(id);
+            await _unitOfWork.CompleteAsync();
 
             return NoContent();
-        }
-
-        private bool ReservationExists(Guid id)
-        {
-            return _context.Reservations.Any(e => e.Id == id);
         }
     }
 }

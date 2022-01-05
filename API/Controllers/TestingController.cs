@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs.GetDTOs;
 using API.Interfaces;
+using API.Interfaces.IServices;
 using API.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -22,14 +23,42 @@ namespace API.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
         private readonly ISeatManagerService _seatManagerService;
+        private readonly IReservationService _reservationService;
 
         public TestingController(DataContext context, UserManager<AppUser> userManager, IMapper mapper
-        , ISeatManagerService seatManagerService)
+        , ISeatManagerService seatManagerService, IReservationService reservationService)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
             _seatManagerService = seatManagerService;
+            _reservationService = reservationService;
+        }
+
+        [HttpGet("TestReservationService")]
+        public async Task<ActionResult> TestReservationService()
+        {
+            ShowTime showTime = _context.ShowTimes
+                .Include(st => st.Venue)
+                .Include(st => st.Movie)
+                .Include(st => st.SeatPackages)
+                .ThenInclude(sp => sp.Seat)
+                .FirstOrDefault();
+
+            ICollection<SeatPackage> seatsPackages = new List<SeatPackage>();
+
+            seatsPackages.Add(showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 2 && sp.Seat.RowNumber == 0));
+            seatsPackages.Add(showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 3 && sp.Seat.RowNumber == 0));
+
+            Reservation reservation = new Reservation()
+            {
+                ShowTime = showTime,
+                SeatsPackages = seatsPackages
+            };
+            _reservationService.OrderReservation(ref reservation);
+            _context.Reservations.Add(reservation);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpGet("GetReservations")]

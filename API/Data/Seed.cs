@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using API.DTOs.GetDTOs;
 using API.Enums;
 using API.Interfaces;
+using API.Interfaces.IServices;
 using API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -130,31 +131,44 @@ namespace API.Data
                 .ThenInclude(sp => sp.Seat)
                 .FirstOrDefault();
 
-            List<SeatPackage> seatsPackages = new List<SeatPackage>();
-            if (showTime != null)
+            AppUser costumer = await context.Users.FirstOrDefaultAsync(au=> au.UserName == "lisa");
+
+            if (costumer is AdminUser)
             {
-                seatsPackages.Add(
-                    showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 0 && sp.Seat.RowNumber == 0));
-                seatsPackages.Add(
-                    showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 0 && sp.Seat.RowNumber == 1));
-
-                foreach (SeatPackage seatsPackage in seatsPackages)
-                {
-                    seatsPackage.IsAvailable = false;
-                }
-
-                Reservation reservation = new Reservation()
-                {
-                    OrderTime = DateTime.Now,
-                    ShowTimeId = showTime.Id,
-                    SeatsPackages = seatsPackages,
-                    Price = 3.75 * seatsPackages.Count,
-                    StartTime = DateTime.Now.AddHours(12)
-                };
-                context.Reservations.Add(reservation);
+                throw new UnauthorizedAccessException();
             }
 
-            await context.SaveChangesAsync();
+            if (costumer is CostumerUser)
+            {
+                List<SeatPackage> seatsPackages = new List<SeatPackage>();
+                if (showTime != null)
+                {
+                    seatsPackages.Add(
+                        showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 0 && sp.Seat.RowNumber == 0));
+                    seatsPackages.Add(
+                        showTime.SeatPackages.FirstOrDefault(sp => sp.Seat.ColNumber == 1 && sp.Seat.RowNumber == 0));
+
+                    foreach (SeatPackage seatsPackage in seatsPackages)
+                    {
+                        seatsPackage.IsAvailable = false;
+                    }
+
+                    Reservation reservation = new Reservation()
+                    {
+                        OrderTime = DateTime.Now,
+                        ShowTimeId = showTime.Id,
+                        SeatsPackages = seatsPackages,
+                        Price = 3.75 * seatsPackages.Count,
+                        Costumer = costumer as CostumerUser,
+                        StartTime = showTime.StartTime
+                    };
+                    context.Reservations.Add(reservation);
+                }
+
+                await context.SaveChangesAsync();
+            }
+
+
 
         }
 

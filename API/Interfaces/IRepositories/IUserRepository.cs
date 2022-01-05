@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.DTOs;
-using API.Models;
-using Microsoft.AspNetCore.Mvc;
 
-namespace API.Interfaces
+namespace API.Interfaces.IRepositories
 {
     public interface IUserRepository
     {

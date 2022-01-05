@@ -44,7 +44,7 @@ namespace API.Controllers
         {
             _unitOfWork.ShowTimeRepository.UpdateShowTime(showTime);
             await _unitOfWork.CompleteAsync();
-            return Ok(showTime);
+            return Ok();
         }
 
 

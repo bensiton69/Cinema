@@ -2,7 +2,7 @@
 using API.Data;
 using API.Models;
 
-namespace API.Interfaces
+namespace API.Interfaces.IServices
 {
     public interface ISeatManagerService
     {

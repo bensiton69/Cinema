@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Interfaces;
+using API.Interfaces.IRepositories;
+using API.Interfaces.IServices;
 using API.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;

@@ -8,6 +8,7 @@ using API.DTOs.GetDTOs;
 using API.DTOs.PostDTOs;
 using API.Extensions;
 using API.Interfaces;
+using API.Interfaces.IRepositories;
 using API.Models;
 using API.Models.Queries;
 using AutoMapper;
